@@ -67,3 +67,78 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+export async function listTables(signal) {
+ const url = new URL(`${API_BASE_URL}/tables`);
+ return await fetchJson(url, { headers, signal }, []);
+}
+
+export async function createRes(res, signal) {
+  const url = `${API_BASE_URL}/reservations`;
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ data: res }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+export async function createTable(table, signal) {
+  const url = `${API_BASE_URL}/tables`;
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ data: table }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+
+export async function updateTable(tableId, reservation_id, signal) {
+  const url = `${API_BASE_URL}/tables/${tableId}/seat`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data: {reservation_id: reservation_id} }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+export async function updateResId(tableId, reservation_id, signal) {
+ const url = `${API_BASE_URL}/tables/${tableId}/seat`;
+ const options = {
+   method: "DELETE",
+   headers,
+   body: JSON.stringify({ data: {reservation_id: reservation_id } }),
+   signal,
+ };
+ return await fetchJson(url, options, {});
+}
+
+export async function updateResStatus( reservation_Id, signal) {
+ const url = `${API_BASE_URL}/reservations/${reservation_Id}/status`;
+ const options = {
+   method: "PUT",
+   headers,
+   body: JSON.stringify({ data: {status: 'cancelled'} }),
+   signal,
+ };
+ let result = await fetchJson(url, options, {});
+ return result
+}
+export async function updateRes( reservation_Id, newReservation, signal) {
+ const url = `${API_BASE_URL}/reservations/${reservation_Id}`;
+ const options = {
+   method: "PUT",
+   headers,
+   body: JSON.stringify({ data: newReservation }),
+   signal,
+ };
+ let result = await fetchJson(url, options, {});
+ return result
+}
+
+export async function editRes( resId, signal ) {
+ const url = new URL(`${API_BASE_URL}/reservations/${resId}`);
+ return await fetchJson(url, { headers, signal }, [])
+}
