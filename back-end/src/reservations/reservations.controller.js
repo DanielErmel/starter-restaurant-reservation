@@ -12,7 +12,7 @@ async function validateData(request, res, next) {
   next();
 }
 
-async function validateBody(req, res, next) {
+async function validateBody(request, res, next) {
   const required = [
     "first_name",
     "last_name",
@@ -23,25 +23,25 @@ async function validateBody(req, res, next) {
   ];
 
   for (const field of required) {
-    if (!req.body.data.hasOwnProperty(field) || req.body.data[field] === "") {
+    if (!request.body.data.hasOwnProperty(field) || request.body.data[field] === "") {
       return next({status: 400, message: `Field required: '${field}'`});
     }
   }
 
-  if (Number.isNaN(Date.parse(`${req.body.data.reservation_date} ${req.body.data.reservation_time}`))) {
+  if (Number.isNaN(Date.parse(`${request.body.data.reservation_date} ${request.body.data.reservation_time}`))) {
     return next({status: 400, message: "'reservation_date' or 'reservation_time' field is not in the correct format", })
   }
 
-  if (typeof req.body.data.people !== "number") {
+  if (typeof request.body.data.people !== "number") {
     return next({status: 400, message: "Number required in 'people' field"});
   }
 
-  if (req.body.data.people < 1) {
+  if (request.body.data.people < 1) {
     return next({status: 400, message: "Must be at least 1 person in 'people' field"});
   }
 
-  if (req.body.data.status && req.body.data.status !== "booked") {
-    return next({status: 400, message: `'status' cannot be ${req.body.data.status}`,});
+  if (request.body.data.status && request.body.data.status !== "booked") {
+    return next({status: 400, message: `'status' cannot be ${request.body.data.status}`,});
   }
 
   if (/^[0-9\-]+$/.test(request.body.data.mobile_number) === false ) {
@@ -54,7 +54,7 @@ async function validateBody(req, res, next) {
 
 //US 02, check for validation of future date/time properness
 
-async function validateDate(req, res, next) {
+async function validateDate(request, response, next) {
   const reservationDate = new Date(`${request.body.data.reservation_date}T${request.body.data.reservation_time}:00.000`);
 
   const today = new Date();
@@ -83,27 +83,27 @@ async function validateDate(req, res, next) {
 }
 
 // return data with a given reservation ID
-async function validateReservationId(req, res, next) {
-  const {reservation_id} = req.params;
+async function validateReservationId(request, response, next) {
+  const {reservation_id} = request.params;
   const reservation = await service.read(Number(reservation_id));
   if (!reservation) {
     return next({status: 404, message: `${reservation_id} does not exist`, });
   }
-  res.locals.reservation = reservation;
+  response.locals.reservation = reservation;
   next();
 }
 
 // validating reservation status
-async function validateUpdateBody(req, res, next) {
-  if (!req.body.data.status) {
+async function validateUpdateBody(request, response, next) {
+  if (!request.body.data.status) {
     return next({status: 400, message: "Body must include a status" })
   }
 
-  if (req.body.data.status !== "booked" && req.body.data.status !== "seated" && req.body.data.status !== "finished" && req.body.data.status !== "cancelled") {
-    return next({status: 400, message: `Status field cannot be ${req.body.data.status}`, })
+  if (request.body.data.status !== "booked" && request.body.data.status !== "seated" && request.body.data.status !== "finished" && request.body.data.status !== "cancelled") {
+    return next({status: 400, message: `Status field cannot be ${request.body.data.status}`, })
   }
 
-  if(res.locals.reservation.status === "finished") {
+  if(response.locals.reservation.status === "finished") {
     return next({status: 400, message: `Unable to update a finished reservation`,});
   }
 
@@ -114,34 +114,34 @@ async function validateUpdateBody(req, res, next) {
  * List handlers for reservation resources
  */
 
-async function list(req, res) {
-  const date = req.query.date;
-  const mobile = req.query.mobile_number;
+async function list(request, response) {
+  const date = request.query.date;
+  const mobile = request.query.mobile_number;
   const reservations = await service.list(date, mobile);
   const reservation = reservations.filter((reservation) => reservation.status !== "finished");
-  res.json({data: reservation });
+  response.json({data: reservation });
 }
 
-async function create(req, res) {
-  req.body.data.status = "booked";
-  const reservation = await service.create(req.body.data);
-  res.status(201).json({data: reservation[0]})
+async function create(request, response) {
+  request.body.data.status = "booked";
+  const reservation = await service.create(request.body.data);
+  response.status(201).json({data: reservation[0]})
 }
 
-async function update(req, res) {
+async function update(request, response) {
   await service.update(
-    res.locals.reservation.reservation_id, req.body.data.status
+    response.locals.reservation.reservation_id, request.body.data.status
   )
-  res.status(200).json({data: {status: req.body.data.status}});
+  response.status(200).json({data: {status: request.body.data.status}});
 }
 
-async function edit(req, res) {
-  const reservation = await service.edit(res.locals.reservation.reservation_id, req.body.data);
-  res.status(200).json({data: reservation[0]})
+async function edit(request, response) {
+  const reservation = await service.edit(response.locals.reservation.reservation_id, request.body.data);
+  response.status(200).json({data: reservation[0]})
 }
 
-async function read(req, res) {
-  res.status(200).json({data:res.locals.reservation});
+async function read(request, response) {
+  response.status(200).json({data:response.locals.reservation});
 }
 
 module.exports = {
