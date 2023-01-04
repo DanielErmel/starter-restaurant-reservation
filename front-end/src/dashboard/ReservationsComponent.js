@@ -1,5 +1,6 @@
 import { updateResStatus } from "../utils/api"
-
+import * as React from "react";
+import { Link } from "react-router-dom";
 export default function ReservationsComponent({reservations, loadDashboard}){
 
   function onCancel(e,reservation){
@@ -26,8 +27,11 @@ export default function ReservationsComponent({reservations, loadDashboard}){
              <p className="card-text" data-reservation-id-status={reservation.reservation_id}>Reservation Status: {reservation.status}</p>
              
              { reservation.status!=='seated' ? 
+             <Link to={`/reservations/${reservation.reservation_id}/seat`} /> : null }
+
+             {/* { reservation.status!=='seated' ? 
              <a href={`/reservations/${reservation.reservation_id}/seat`}>
-             <button className="btn btn-primary w-25 mb-1 ml-1" type="button">Seat</button></a> : null }
+             <button className="btn btn-primary w-25 mb-1 ml-1" type="button">Seat</button></a> : null } */}
 
              <a href={`/reservations/${reservation.reservation_id}/edit`}>
             <button className="btn btn-secondary w-25 mb-1 ml-1" type="button">Edit</button>
