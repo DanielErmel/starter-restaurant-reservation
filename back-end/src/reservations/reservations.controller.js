@@ -136,8 +136,10 @@ async function update(request, response) {
 }
 
 async function edit(request, response) {
-  const reservation = await service.edit(response.locals.reservation.reservation_id, request.body.data);
-  response.status(200).json({data: reservation[0]})
+  const res = await service.edit(
+    response.locals.reservation.reservation_id, request.body.data
+  );
+  response.status(200).json({ data: res[0] });
 }
 
 async function read(request, response) {

@@ -23,10 +23,10 @@ function update(reservation_id, status) {
 }
 //Edit with given ID
 function edit(reservation_id, reservation) {
-  return knex(tableName)
-    .where({reservation_id: reservation_id})
-    .update ({...reservation})
-    .returning("*")
+  return knex(tableName) 
+  .where( { reservation_id: reservation_id })
+  .update({ ...reservation })
+  .returning("*")
 }
 
 //List all matching reservations by date/number
@@ -48,5 +48,10 @@ function list(date, mobile_number) {
     .select("*")
 }
 
-//CHECK ORDER OF EXPORTS LATER IF IT DOESN'T WORK
-module.exports = {create, read, update, edit, list}
+module.exports = {
+  list,
+  create,
+  read,
+  update,
+  edit,
+};
