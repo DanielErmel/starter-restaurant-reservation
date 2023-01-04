@@ -27,7 +27,7 @@ export default function ReservationsComponent({reservations, loadDashboard}){
              <p className="card-text" data-reservation-id-status={reservation.reservation_id}>Reservation Status: {reservation.status}</p>
              
              { reservation.status!=='seated' ? 
-             <Link to={`/reservations/${reservation.reservation_id}/seat`} /> : null }
+             <Link to={`/reservations/${reservation.reservation_id}/seat`}>Link</Link> : null }
 
              {/* { reservation.status!=='seated' ? 
              <a href={`/reservations/${reservation.reservation_id}/seat`}>
